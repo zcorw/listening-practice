@@ -7,19 +7,26 @@
     </div>
     <div class="video-controls">
       <div class="slider-control">
-        <div class="slider">
-          <div class="slider-rail"></div>
-          <div class="slider-progress"></div>
-          <div class="slider-handle"></div>
+        <div ref="sliderContainer" class="slider" @click="setProgress">
+          <div ref="slider" class="slider-rail" @click="setProgress"></div>
+          <div class="slider-progress" :style="{ width: schedule }"></div>
+          <div
+            class="slider-handle"
+            :style="{ left: schedule }"
+            @mousedown="mouseDown"
+          ></div>
         </div>
-        <div class="slider-time">00:00:00</div>
+        <div class="slider-time">{{ currentTimeDisplay }}</div>
       </div>
       <div class="control-buttons">
         <a class="control-button prev"></a>
-        <a class="control-button start-point"></a>
-        <a class="control-button" :class="isPlay ? 'pause' : 'play'"></a>
-        <a class="control-button end-point"></a>
+        <a
+          class="control-button"
+          :class="isPlay ? 'pause' : 'play'"
+          @click="togglePlay"
+        ></a>
         <a class="control-button next"></a>
+        <a class="control-button mark"></a>
       </div>
     </div>
   </div>
@@ -27,6 +34,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
+import utils from "@/utils";
 const props = defineProps({
   width: {
     type: Number,
@@ -42,13 +50,74 @@ const styles = computed(() => ({
   height: `${props.height}px`,
 }));
 const videoPlayer = ref<HTMLVideoElement>();
+const slider = ref<HTMLDivElement>();
+const sliderContainer = ref<HTMLDivElement>();
 const isPlay = ref(false);
+const duration = ref(0);
+const currentTime = ref(0);
+const currentTimeDisplay = computed(() => {
+  return utils.formatTime(currentTime.value);
+});
+const schedule = computed(() => {
+  return `${(currentTime.value / duration.value) * 100}%`;
+});
+let stopPropagation = false;
 function loadVideo(url: string) {
   const player = videoPlayer.value;
   if (!player) return;
   player.src = url;
   player.load();
   player.play();
+}
+function togglePlay() {
+  const player = videoPlayer.value;
+  if (!player) return;
+  if (player.paused || player.ended) {
+    if (player.ended) {
+      player.currentTime = 0;
+    }
+    player.play();
+    isPlay.value = true;
+  } else {
+    player.pause();
+    isPlay.value = false;
+  }
+}
+function setProgress(e: MouseEvent) {
+  if (stopPropagation) return;
+  const player = videoPlayer.value;
+  if (!player) return;
+  const width = slider.value?.clientWidth as number;
+  const clickX = e.offsetX;
+  player.currentTime = (clickX / width) * duration.value;
+}
+function mouseDown(e: MouseEvent) {
+  e.preventDefault();
+  e.stopPropagation();
+  stopPropagation = true;
+  document.addEventListener("mousemove", mouseMove);
+  document.addEventListener("mouseup", mouseUp);
+}
+function mouseMove(e: MouseEvent) {
+  const player = videoPlayer.value;
+  if (!sliderContainer.value || !player) return;
+  const rect = sliderContainer.value.getBoundingClientRect();
+  const offsetX = e.clientX - rect.left;
+  const width = sliderContainer.value.clientWidth;
+  const duration = player.duration;
+  let percent = (offsetX / width) * 100;
+
+  if (percent < 0) percent = 0;
+  if (percent > 100) percent = 100;
+
+  currentTime.value = (percent / 100) * duration;
+}
+function mouseUp(e: MouseEvent) {
+  e.stopPropagation();
+  document.removeEventListener("mousemove", mouseMove);
+  document.removeEventListener("mouseup", mouseUp);
+  videoPlayer.value!.currentTime = currentTime.value;
+  setTimeout(() => (stopPropagation = false));
 }
 onMounted(() => {
   const player = videoPlayer.value;
@@ -59,8 +128,12 @@ onMounted(() => {
   player.addEventListener("pause", () => {
     isPlay.value = false;
   });
-  player.addEventListener("loadedmetadata", (ev) => {
-    console.log(ev);
+  player.addEventListener("loadedmetadata", function () {
+    duration.value = player.duration;
+  });
+  player.addEventListener("timeupdate", function () {
+    if (stopPropagation) return;
+    currentTime.value = player.currentTime;
   });
 });
 defineExpose({ loadVideo });
@@ -98,7 +171,7 @@ defineExpose({ loadVideo });
       .slider-progress {
         position: absolute;
         top: 2px;
-        width: 59%;
+        width: 0%;
         height: 4px;
         background-color: #1677ff;
         border-radius: 2px;
@@ -106,7 +179,7 @@ defineExpose({ loadVideo });
       .slider-handle {
         position: absolute;
         top: 2px;
-        left: 59%;
+        left: 0%;
         width: 12px;
         height: 12px;
         background-color: #fff;
@@ -144,6 +217,9 @@ defineExpose({ loadVideo });
     }
     .next {
       background-image: url(/images/next.svg);
+    }
+    .mark {
+      background-image: url(/images/mark.svg);
     }
   }
 }
