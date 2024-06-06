@@ -1,7 +1,7 @@
 <template>
   <div class="video-player">
     <div class="video-screen">
-      <video ref="videoPlayer" :style="styles">
+      <video ref="videoPlayer" autoplay="false" :style="styles">
         Your browser does not support the video tag.
       </video>
     </div>
@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import utils from "@/utils";
 const props = defineProps({
   width: {
@@ -67,7 +67,6 @@ function loadVideo(url: string) {
   if (!player) return;
   player.src = url;
   player.load();
-  player.play();
 }
 function togglePlay() {
   const player = videoPlayer.value;
@@ -119,22 +118,38 @@ function mouseUp(e: MouseEvent) {
   videoPlayer.value!.currentTime = currentTime.value;
   setTimeout(() => (stopPropagation = false));
 }
+function setPlayStart() {
+  isPlay.value = true;
+}
+function setPlayStop() {
+  isPlay.value = false;
+}
+function setDuration() {
+  const player = videoPlayer.value;
+  if (!player) return;
+  duration.value = player.duration;
+}
+function setCurrentTime() {
+  const player = videoPlayer.value;
+  if (!player) return;
+  if (stopPropagation) return;
+  currentTime.value = player.currentTime;
+}
 onMounted(() => {
   const player = videoPlayer.value;
   if (!player) return;
-  player.addEventListener("play", () => {
-    isPlay.value = true;
-  });
-  player.addEventListener("pause", () => {
-    isPlay.value = false;
-  });
-  player.addEventListener("loadedmetadata", function () {
-    duration.value = player.duration;
-  });
-  player.addEventListener("timeupdate", function () {
-    if (stopPropagation) return;
-    currentTime.value = player.currentTime;
-  });
+  player.addEventListener("play", setPlayStart);
+  player.addEventListener("pause", setPlayStop);
+  player.addEventListener("loadedmetadata", setDuration);
+  player.addEventListener("timeupdate", setCurrentTime);
+});
+onUnmounted(() => {
+  const player = videoPlayer.value;
+  if (!player) return;
+  player.removeEventListener("play", setPlayStart);
+  player.removeEventListener("pause", setPlayStop);
+  player.removeEventListener("loadedmetadata", setDuration);
+  player.removeEventListener("timeupdate", setCurrentTime);
 });
 defineExpose({ loadVideo });
 </script>
