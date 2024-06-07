@@ -6,6 +6,7 @@
         ref="video"
         :width="videoStyle.width"
         :height="videoStyle.height"
+        @loaded="videoLoaded"
       />
       <VideoInput
         v-else
@@ -13,6 +14,7 @@
         :width="videoStyle.width"
         :height="videoStyle.height"
       />
+      <SubtitleInput />
     </div>
     <div class="subtitle-side"></div>
   </div>
@@ -22,6 +24,12 @@
 import { ref, nextTick, onMounted } from "vue";
 import VideoInput from "./components/VideoInput.vue";
 import VideoPlayer from "./components/VideoPlayer.vue";
+import SubtitleInput from "./components/SubtitleInput.vue";
+import subtitleStore, { Subtitle } from "./utils/subtitleStore";
+import type { videoLoadedParams } from "./global.d";
+
+let subtitleHeadNode: Subtitle | null = null;
+
 const showPlayer = ref(false);
 const video = ref();
 const videoSide = ref<HTMLElement>();
@@ -45,6 +53,9 @@ const resizeObserver = new ResizeObserver((entries) => {
     }
   }
 });
+function videoLoaded(data: videoLoadedParams) {
+  subtitleHeadNode = subtitleStore.init(data.duration);
+}
 onMounted(() => {
   resizeObserver.observe(videoSide.value as HTMLElement);
 });

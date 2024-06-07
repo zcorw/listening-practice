@@ -33,9 +33,13 @@
   </div>
 </template>
 
+<script lang="ts">
+import type { videoLoadedParams } from "@/global.d";
+</script>
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import utils from "@/utils";
+
 const props = defineProps({
   width: {
     type: Number,
@@ -46,7 +50,10 @@ const props = defineProps({
     default: 720,
   },
 });
-const emits = defineEmits(["loaded", "updateTime"]);
+const emits = defineEmits<{
+  (e: "loaded", data: videoLoadedParams): void;
+  (e: "updateTime", time: number): void;
+}>();
 const styles = computed(() => ({
   width: `${props.width}px`,
   height: `${props.height}px`,

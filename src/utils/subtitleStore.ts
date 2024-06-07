@@ -1,4 +1,4 @@
-class Subtitle {
+export class Subtitle {
   public next: Subtitle | null = null;
   public prev: Subtitle | null = null;
   constructor(
