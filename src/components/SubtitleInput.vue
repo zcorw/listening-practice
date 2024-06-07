@@ -4,7 +4,8 @@
       <textarea
         ref="textarea"
         class="textarea"
-        :value="text"
+        :value="props.text"
+        :disabled="props.disabled"
         @input="hanldeChange"
       ></textarea>
     </div>
@@ -13,8 +14,20 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
+const props = defineProps({
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  text: {
+    type: String,
+    default: "",
+  },
+});
+const emits = defineEmits<{
+  (e: "update:text", text: string): void;
+}>();
 const textarea = ref<HTMLTextAreaElement>();
-const text = ref("");
 function setHeight(height: number) {
   if (height < 33) {
     height = 33;
@@ -30,7 +43,9 @@ function setHeight(height: number) {
 function hanldeChange() {
   const element = textarea.value as HTMLTextAreaElement;
   element.style.height = "33px";
-  text.value = element.value;
+  if (props.text !== element.value) {
+    emits("update:text", element.value);
+  }
   setHeight(element.scrollHeight);
 }
 onMounted(() => {

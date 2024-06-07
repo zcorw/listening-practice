@@ -4,7 +4,9 @@
       <video ref="videoPlayer" autoplay="false" :style="styles">
         Your browser does not support the video tag.
       </video>
-      <div class="video-overlay">11111111111111111</div>
+      <div v-if="props.subtitleText" class="video-overlay">
+        {{ props.subtitleText }}
+      </div>
     </div>
     <div class="video-controls">
       <div class="slider-control">
@@ -27,7 +29,7 @@
           @click="togglePlay"
         ></a>
         <a class="control-button next"></a>
-        <a class="control-button mark"></a>
+        <a class="control-button mark" @click="insertTimePoint"></a>
       </div>
     </div>
   </div>
@@ -49,10 +51,15 @@ const props = defineProps({
     type: Number,
     default: 720,
   },
+  subtitleText: {
+    type: String,
+    default: "",
+  },
 });
 const emits = defineEmits<{
   (e: "loaded", data: videoLoadedParams): void;
   (e: "updateTime", time: number): void;
+  (e: "insertTimePoint", time: number): void;
 }>();
 const styles = computed(() => ({
   width: `${props.width}px`,
@@ -149,6 +156,9 @@ function setCurrentTime() {
   if (!player) return;
   if (stopPropagation) return;
   currentTime.value = player.currentTime;
+}
+function insertTimePoint() {
+  emits("insertTimePoint", currentTime.value);
 }
 onMounted(() => {
   const player = videoPlayer.value;
