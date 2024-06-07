@@ -4,6 +4,7 @@
       <video ref="videoPlayer" autoplay="false" :style="styles">
         Your browser does not support the video tag.
       </video>
+      <div class="video-overlay">11111111111111111</div>
     </div>
     <div class="video-controls">
       <div class="slider-control">
@@ -33,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import utils from "@/utils";
 const props = defineProps({
   width: {
@@ -45,6 +46,7 @@ const props = defineProps({
     default: 720,
   },
 });
+const emits = defineEmits(["loaded", "updateTime"]);
 const styles = computed(() => ({
   width: `${props.width}px`,
   height: `${props.height}px`,
@@ -55,6 +57,9 @@ const sliderContainer = ref<HTMLDivElement>();
 const isPlay = ref(false);
 const duration = ref(0);
 const currentTime = ref(0);
+watch(currentTime, (val) => {
+  emits("updateTime", val);
+});
 const currentTimeDisplay = computed(() => {
   return utils.formatTime(currentTime.value);
 });
@@ -128,6 +133,9 @@ function setDuration() {
   const player = videoPlayer.value;
   if (!player) return;
   duration.value = player.duration;
+  emits("loaded", {
+    duration: player.duration,
+  });
 }
 function setCurrentTime() {
   const player = videoPlayer.value;
@@ -236,6 +244,19 @@ defineExpose({ loadVideo });
     .mark {
       background-image: url(/images/mark.svg);
     }
+  }
+  .video-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 15%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 70%; /* 防止字幕过长 */
+    box-sizing: border-box; /* 包含内边距和边框在宽度计算中 */
+    text-align: center;
+    font-size: 14px;
   }
 }
 </style>

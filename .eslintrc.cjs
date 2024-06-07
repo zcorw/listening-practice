@@ -24,7 +24,7 @@ module.exports = {
         semi: true,
       },
     ],
-    "comma-dangle": ["off", "always-multiline"],
+    "comma-dangle": ["error", "always-multiline"],
     "vue/require-default-prop": [
       "off",
       {
