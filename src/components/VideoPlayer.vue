@@ -11,6 +11,7 @@
     <div class="video-controls">
       <div class="slider-control">
         <div ref="sliderContainer" class="slider" @click="setProgress">
+          <i v-for="tag in tags" :key="tag" :style="{ left: tag }"></i>
           <div ref="slider" class="slider-rail" @click="setProgress"></div>
           <div class="slider-progress" :style="{ width: schedule }"></div>
           <div
@@ -40,6 +41,7 @@ import type { videoLoadedParams } from "@/global.d";
 </script>
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import type { PropType } from "vue";
 import utils from "@/utils";
 
 const props = defineProps({
@@ -55,6 +57,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  subtitleTimes: {
+    type: Array as PropType<number[]>,
+    default: () => [],
+  },
 });
 const emits = defineEmits<{
   (e: "loaded", data: videoLoadedParams): void;
@@ -65,6 +71,11 @@ const styles = computed(() => ({
   width: `${props.width}px`,
   height: `${props.height}px`,
 }));
+const tags = computed(() => {
+  return props.subtitleTimes.map((time) => {
+    return `${(time / duration.value) * 100}%`;
+  });
+});
 const videoPlayer = ref<HTMLVideoElement>();
 const slider = ref<HTMLDivElement>();
 const sliderContainer = ref<HTMLDivElement>();
@@ -200,6 +211,17 @@ defineExpose({ loadVideo });
       position: relative;
       margin: 11px 5px;
       padding: 4px 0;
+      i {
+        display: inline-block;
+        position: absolute;
+        top: -14px;
+        width: 15px;
+        height: 10px;
+        margin-left: -7px;
+        background-image: url(/images/triangle.svg);
+        background-size: 100%;
+        background-repeat: no-repeat;
+      }
       .slider-rail {
         position: absolute;
         top: 2px;
@@ -266,7 +288,7 @@ defineExpose({ loadVideo });
     position: absolute;
     bottom: 20px;
     left: 15%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.8);
     color: white;
     padding: 10px;
     border-radius: 5px;

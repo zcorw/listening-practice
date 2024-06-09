@@ -7,6 +7,7 @@
         :width="videoStyle.width"
         :height="videoStyle.height"
         :subtitleText="subtitleText"
+        :subtitleTimes="subtitleTimes"
         @loaded="videoLoaded"
         @insertTimePoint="insertTimePoint"
       />
@@ -23,15 +24,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, nextTick, onMounted } from "vue";
+import { ref, computed, watch, nextTick, onMounted } from "vue";
 import VideoInput from "./components/VideoInput.vue";
 import VideoPlayer from "./components/VideoPlayer.vue";
 import SubtitleInput from "./components/SubtitleInput.vue";
-import subtitleStore from "./utils/subtitleStore";
-import type { Subtitle } from "./utils/subtitleStore";
+import subtitleHook from "./utils/subtitleHook";
+import type { Subtitle } from "./utils/subtitleHook";
 import type { videoLoadedParams } from "./global.d";
-
-let subtitleHeadNode: Subtitle | null = null;
 
 const showPlayer = ref(false);
 const video = ref();
@@ -40,19 +39,38 @@ const videoStyle = ref<{ width: number; height: number }>({
   width: 1280,
   height: 720,
 });
-const subtitleCurrentNode = ref<Subtitle>();
+let subtitleCurrentNode = ref<Subtitle | null>(null);
 const subtitleText = ref<string>("");
-watch(subtitleCurrentNode, (val, oldVal) => {
-  if (val) {
-    subtitleText.value = val.text;
-    val.onTextEvent((text) => (subtitleText.value = text));
-  } else {
-    subtitleText.value = "";
+const {
+  list: subtitleList,
+  init,
+  splitSubtitle,
+  getCurrentSubtitle,
+} = subtitleHook();
+console.log("subtitleList", subtitleList);
+const subtitleTimes = computed(() => {
+  if (subtitleList.value.length === 0) {
+    return [];
   }
-  if (oldVal) {
-    oldVal.removeTextEvent();
-  }
+  return subtitleList.value.slice(0, -1).map((item) => item.endTime);
 });
+watch(
+  subtitleCurrentNode,
+  (val, oldVal) => {
+    if (val === null) {
+      subtitleText.value = "";
+      return;
+    }
+    if (oldVal === null) {
+      subtitleText.value = val.text;
+      return;
+    }
+    if (val.text !== oldVal.text) {
+      subtitleText.value = val.text;
+    }
+  },
+  { deep: true },
+);
 function uploadVideo(url: string) {
   showPlayer.value = true;
   nextTick(() => video.value?.loadVideo(url));
@@ -70,17 +88,11 @@ const resizeObserver = new ResizeObserver((entries) => {
   }
 });
 function videoLoaded(data: videoLoadedParams) {
-  subtitleCurrentNode.value = subtitleHeadNode = subtitleStore.init(
-    data.duration,
-  );
+  subtitleCurrentNode.value = init(data.duration);
 }
 function insertTimePoint(time: number) {
   if (!subtitleCurrentNode.value) return;
-  subtitleCurrentNode.value = subtitleStore.splitSubtitle(
-    time,
-    subtitleCurrentNode.value,
-  );
-  subtitleText.value = subtitleCurrentNode.value.text;
+  subtitleCurrentNode.value = splitSubtitle(time, subtitleCurrentNode.value);
 }
 onMounted(() => {
   resizeObserver.observe(videoSide.value as HTMLElement);
