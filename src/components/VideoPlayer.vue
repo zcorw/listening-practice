@@ -296,6 +296,7 @@ defineExpose({ loadVideo });
     box-sizing: border-box; /* 包含内边距和边框在宽度计算中 */
     text-align: center;
     font-size: 14px;
+    white-space: break-spaces;
   }
 }
 </style>

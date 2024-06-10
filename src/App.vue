@@ -19,7 +19,9 @@
       />
       <SubtitleInput v-model:text="subtitleText" />
     </div>
-    <div class="subtitle-side"></div>
+    <div class="subtitle-side">
+      <SubtitleSection :subtitles="subtitleList" />
+    </div>
   </div>
 </template>
 
@@ -28,6 +30,7 @@ import { ref, computed, watch, nextTick, onMounted } from "vue";
 import VideoInput from "./components/VideoInput.vue";
 import VideoPlayer from "./components/VideoPlayer.vue";
 import SubtitleInput from "./components/SubtitleInput.vue";
+import SubtitleSection from "./components/SubtitleSection.vue";
 import subtitleHook from "./utils/subtitleHook";
 import type { Subtitle } from "./utils/subtitleHook";
 import type { videoLoadedParams } from "./global.d";
@@ -47,7 +50,6 @@ const {
   splitSubtitle,
   getCurrentSubtitle,
 } = subtitleHook();
-console.log("subtitleList", subtitleList);
 const subtitleTimes = computed(() => {
   if (subtitleList.value.length === 0) {
     return [];
@@ -71,6 +73,10 @@ watch(
   },
   { deep: true },
 );
+watch(subtitleText, (val) => {
+  if (!subtitleCurrentNode.value) return;
+  subtitleCurrentNode.value.text = val;
+});
 function uploadVideo(url: string) {
   showPlayer.value = true;
   nextTick(() => video.value?.loadVideo(url));
@@ -117,6 +123,7 @@ onMounted(() => {
   .subtitle-side {
     width: 304px;
     padding-right: var(--container-space);
+    padding-top: var(--container-space);
   }
 }
 </style>
