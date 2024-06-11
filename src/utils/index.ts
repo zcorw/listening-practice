@@ -68,7 +68,7 @@ function upload(): Promise<string> {
       reader.onload = () => {
         resolve(reader.result as string);
       };
-      reader.readAsDataURL(target.files![0]);
+      reader.readAsText(target.files![0]);
     };
     document.body.appendChild(input);
     input.click();
