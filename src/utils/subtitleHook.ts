@@ -39,7 +39,6 @@ export default function subtitleHook() {
         return list.value[i];
       }
     }
-    console.log(time, list.value);
     throw new Error("超出时间范围");
   }
   return {

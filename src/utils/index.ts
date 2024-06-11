@@ -15,14 +15,18 @@ const parseTime = (time: string): number => {
 function convertToSRT(subtitles: Subtitle[]) {
   return subtitles
     .map((subtitle, index) => {
+      if (subtitle.text.trim() === "") {
+        return "";
+      }
       const start = formatTime(subtitle.startTime) + ",000";
       const end = formatTime(subtitle.endTime) + ",000";
-      return `${index + 1}\n${start} --> ${end}\n${subtitle.text}\n`;
+      return `${index + 1}\n${start} --> ${end}\n${subtitle.text.trim()}\n`;
     })
+    .filter(Boolean)
     .join("\n");
 }
 
-const parseSRT = (srt: string): Subtitle[] => {
+const parseSRT = (srt: string, end: number): Subtitle[] => {
   const subtitles: Subtitle[] = [];
   const blocks = srt.split("\n\n");
 
@@ -50,7 +54,20 @@ const parseSRT = (srt: string): Subtitle[] => {
       }
     }
   });
-
+  if (subtitles[0].startTime !== 0) {
+    subtitles.unshift({
+      startTime: 0,
+      endTime: subtitles[0].startTime,
+      text: "",
+    });
+  }
+  if (subtitles[subtitles.length - 1].endTime !== end) {
+    subtitles.push({
+      startTime: subtitles[subtitles.length - 1].endTime,
+      endTime: end,
+      text: "",
+    });
+  }
   return subtitles;
 };
 
