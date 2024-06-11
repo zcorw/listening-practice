@@ -104,10 +104,17 @@ function upload(): Promise<string> {
   });
 }
 
+function removeFileExtension(fileName: string): string {
+  const lastDotIndex = fileName.lastIndexOf(".");
+  if (lastDotIndex === -1) return fileName; // 没有扩展名
+  return fileName.substring(0, lastDotIndex);
+}
+
 export default {
   formatTime,
   convertToSRT,
   parseSRT,
   download,
   upload,
+  removeFileExtension,
 };

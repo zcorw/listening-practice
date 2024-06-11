@@ -49,6 +49,7 @@ const videoStyle = ref<{ width: number; height: number }>({
   width: 1280,
   height: 720,
 });
+const videoName = ref<string>("");
 let subtitleCurrentNode = ref<Subtitle | null>(null);
 provide("subtitleCurrentNode", subtitleCurrentNode);
 const subtitleText = ref<string>("");
@@ -85,8 +86,9 @@ watch(subtitleText, (val) => {
   if (!subtitleCurrentNode.value) return;
   subtitleCurrentNode.value.text = val;
 });
-function uploadVideo(url: string) {
+function uploadVideo(url: string, name: string) {
   showPlayer.value = true;
+  videoName.value = name;
   nextTick(() => video.value?.loadVideo(url));
 }
 const resizeObserver = new ResizeObserver((entries) => {
@@ -113,7 +115,7 @@ function updateTime(time: number) {
 }
 function downloadSubtitle() {
   const srt = utils.convertToSRT(subtitleList.value);
-  utils.download(srt);
+  utils.download(srt, `${utils.removeFileExtension(videoName.value)}.srt`);
 }
 async function uploadSubtitle() {
   const end = subtitleList.value[subtitleList.value.length - 1].endTime;

@@ -17,7 +17,9 @@ const props = defineProps({
     default: 720,
   },
 });
-const emits = defineEmits(["change"]);
+const emits = defineEmits<{
+  (e: "change", url: string, name: string): void;
+}>();
 
 const styles = computed(() => ({
   width: `${props.width}px`,
@@ -32,7 +34,7 @@ function uploadVideo() {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (file) {
       const fileURL = URL.createObjectURL(file);
-      emits("change", fileURL);
+      emits("change", fileURL, file.name);
     }
   };
   input.click();
