@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted } from "vue";
+import { ref, computed, watch, nextTick, provide, onMounted } from "vue";
 import VideoInput from "./components/VideoInput.vue";
 import VideoPlayer from "./components/VideoPlayer.vue";
 import SubtitleInput from "./components/SubtitleInput.vue";
@@ -50,6 +50,7 @@ const videoStyle = ref<{ width: number; height: number }>({
   height: 720,
 });
 let subtitleCurrentNode = ref<Subtitle | null>(null);
+provide("subtitleCurrentNode", subtitleCurrentNode);
 const subtitleText = ref<string>("");
 const {
   list: subtitleList,
@@ -61,7 +62,7 @@ const subtitleTimes = computed(() => {
   if (subtitleList.value.length === 0) {
     return [];
   }
-  return subtitleList.value.slice(0, -1).map((item) => item.endTime);
+  return subtitleList.value.slice(1).map((item) => item.startTime);
 });
 watch(
   subtitleCurrentNode,

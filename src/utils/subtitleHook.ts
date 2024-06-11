@@ -35,10 +35,11 @@ export default function subtitleHook() {
   function getCurrentSubtitle(time: number): Subtitle {
     for (let i = 0; i < list.value.length; i++) {
       const current = list.value[i];
-      if (time >= current.startTime && time <= current.endTime) {
+      if (time >= current.startTime && time < current.endTime) {
         return list.value[i];
       }
     }
+    console.log(time, list.value);
     throw new Error("超出时间范围");
   }
   return {

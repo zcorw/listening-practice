@@ -23,13 +23,13 @@
         <div class="slider-time">{{ currentTimeDisplay }}</div>
       </div>
       <div class="control-buttons">
-        <a class="control-button prev"></a>
+        <a class="control-button prev" @click="prevTime"></a>
         <a
           class="control-button"
           :class="isPlay ? 'pause' : 'play'"
           @click="togglePlay"
         ></a>
-        <a class="control-button next"></a>
+        <a class="control-button next" @click="nextTime"></a>
         <a class="control-button mark" @click="insertTimePoint"></a>
       </div>
     </div>
@@ -40,7 +40,7 @@
 import type { videoLoadedParams } from "@/global.d";
 </script>
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, inject, onMounted, onUnmounted } from "vue";
 import type { PropType } from "vue";
 import utils from "@/utils";
 
@@ -174,6 +174,37 @@ function getCurrentTime() {
 function insertTimePoint() {
   emits("insertTimePoint", currentTime.value);
 }
+function handleKeyDown(event: KeyboardEvent) {
+  if (event.altKey && event.key === "s") {
+    event.preventDefault();
+    togglePlay();
+  } else if (event.altKey && event.key === "i") {
+    event.preventDefault();
+    insertTimePoint();
+  }
+}
+function prevTime() {
+  const player = videoPlayer.value;
+  if (!player) return;
+  for (let i = props.subtitleTimes.length; i >= 0; i--) {
+    if (props.subtitleTimes[i] < currentTime.value) {
+      player.currentTime = props.subtitleTimes[i];
+      return;
+    }
+  }
+  player.currentTime = 0;
+}
+function nextTime() {
+  const player = videoPlayer.value;
+  if (!player) return;
+  for (let i = 0; i < props.subtitleTimes.length; i++) {
+    if (props.subtitleTimes[i] > currentTime.value) {
+      player.currentTime = props.subtitleTimes[i];
+      return;
+    }
+  }
+  player.currentTime = duration.value;
+}
 onMounted(() => {
   const player = videoPlayer.value;
   if (!player) return;
@@ -181,6 +212,7 @@ onMounted(() => {
   player.addEventListener("pause", setPlayStop);
   player.addEventListener("loadedmetadata", setDuration);
   player.addEventListener("timeupdate", setCurrentTime);
+  window.addEventListener("keydown", handleKeyDown);
 });
 onUnmounted(() => {
   const player = videoPlayer.value;
@@ -189,6 +221,7 @@ onUnmounted(() => {
   player.removeEventListener("pause", setPlayStop);
   player.removeEventListener("loadedmetadata", setDuration);
   player.removeEventListener("timeupdate", setCurrentTime);
+  window.removeEventListener("keydown", handleKeyDown);
 });
 defineExpose({ loadVideo, getCurrentTime });
 </script>
