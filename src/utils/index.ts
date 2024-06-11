@@ -13,14 +13,15 @@ const parseTime = (time: string): number => {
 };
 
 function convertToSRT(subtitles: Subtitle[]) {
+  let index = 1;
   return subtitles
-    .map((subtitle, index) => {
+    .map((subtitle) => {
       if (subtitle.text.trim() === "") {
         return "";
       }
       const start = formatTime(subtitle.startTime) + ",000";
       const end = formatTime(subtitle.endTime) + ",000";
-      return `${index + 1}\n${start} --> ${end}\n${subtitle.text.trim()}\n`;
+      return `${index++}\n${start} --> ${end}\n${subtitle.text.trim()}\n`;
     })
     .filter(Boolean)
     .join("\n");
