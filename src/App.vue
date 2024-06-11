@@ -10,6 +10,7 @@
         :subtitleTimes="subtitleTimes"
         @loaded="videoLoaded"
         @insertTimePoint="insertTimePoint"
+        @update-time="updateTime"
       />
       <VideoInput
         v-else
@@ -99,6 +100,9 @@ function videoLoaded(data: videoLoadedParams) {
 function insertTimePoint(time: number) {
   if (!subtitleCurrentNode.value) return;
   subtitleCurrentNode.value = splitSubtitle(time, subtitleCurrentNode.value);
+}
+function updateTime(time: number) {
+  subtitleCurrentNode.value = getCurrentSubtitle(time);
 }
 onMounted(() => {
   resizeObserver.observe(videoSide.value as HTMLElement);
