@@ -1,6 +1,12 @@
 <template>
   <div class="subtitle-section">
-    <div class="subtitle-title">字幕</div>
+    <div class="subtitle-title">
+      字幕
+      <div>
+        <a class="download-btn" @click="upload">导入</a>
+        <a class="download-btn" @click="download">下载</a>
+      </div>
+    </div>
     <div class="subtitle-container">
       <div
         class="subtitle-item"
@@ -29,6 +35,10 @@ const props = defineProps({
     default: () => [],
   },
 });
+const emits = defineEmits<{
+  (e: "download"): void;
+  (e: "upload"): void;
+}>();
 const list = computed(() => {
   return props.subtitles.map((subtitle) => {
     return {
@@ -38,11 +48,20 @@ const list = computed(() => {
     };
   });
 });
+function download() {
+  emits("download");
+}
+function upload() {
+  emits("upload");
+}
 </script>
 
 <style lang="scss" scoped>
 .subtitle-section {
   .subtitle-title {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
     font-size: 20px;
     font-weight: bold;
     margin-bottom: 10px;
@@ -59,5 +78,11 @@ const list = computed(() => {
       }
     }
   }
+}
+.download-btn {
+  color: #409eff;
+  cursor: pointer;
+  float: right;
+  font-size: 14px;
 }
 </style>

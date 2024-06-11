@@ -21,7 +21,11 @@
       <SubtitleInput v-model:text="subtitleText" />
     </div>
     <div class="subtitle-side">
-      <SubtitleSection :subtitles="subtitleList" />
+      <SubtitleSection
+        :subtitles="subtitleList"
+        @download="downloadSubtitle"
+        @upload="uploadSubtitle"
+      />
     </div>
   </div>
 </template>
@@ -33,6 +37,7 @@ import VideoPlayer from "./components/VideoPlayer.vue";
 import SubtitleInput from "./components/SubtitleInput.vue";
 import SubtitleSection from "./components/SubtitleSection.vue";
 import subtitleHook from "./utils/subtitleHook";
+import utils from "./utils";
 import type { Subtitle } from "./utils/subtitleHook";
 import type { videoLoadedParams } from "./global.d";
 
@@ -103,6 +108,16 @@ function insertTimePoint(time: number) {
 }
 function updateTime(time: number) {
   subtitleCurrentNode.value = getCurrentSubtitle(time);
+}
+function downloadSubtitle() {
+  const srt = utils.convertToSRT(subtitleList.value);
+  utils.download(srt);
+}
+async function uploadSubtitle() {
+  const srt = await utils.upload();
+  subtitleList.value = utils.parseSRT(srt);
+  console.log(subtitleList.value, srt);
+  updateTime(video.value.getCurrentTime());
 }
 onMounted(() => {
   resizeObserver.observe(videoSide.value as HTMLElement);

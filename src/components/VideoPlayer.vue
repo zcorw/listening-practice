@@ -168,6 +168,9 @@ function setCurrentTime() {
   if (stopPropagation) return;
   currentTime.value = player.currentTime;
 }
+function getCurrentTime() {
+  return currentTime.value;
+}
 function insertTimePoint() {
   emits("insertTimePoint", currentTime.value);
 }
@@ -187,7 +190,7 @@ onUnmounted(() => {
   player.removeEventListener("loadedmetadata", setDuration);
   player.removeEventListener("timeupdate", setCurrentTime);
 });
-defineExpose({ loadVideo });
+defineExpose({ loadVideo, getCurrentTime });
 </script>
 
 <style lang="scss" scoped>

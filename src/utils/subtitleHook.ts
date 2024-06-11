@@ -33,6 +33,7 @@ export default function subtitleHook() {
     }
   }
   function getCurrentSubtitle(time: number): Subtitle {
+    console.log(list.value, time);
     for (let i = 0; i < list.value.length; i++) {
       const current = list.value[i];
       if (time >= current.startTime && time <= current.endTime) {
