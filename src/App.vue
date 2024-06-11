@@ -23,6 +23,7 @@
     <div class="subtitle-side">
       <SubtitleSection
         :subtitles="subtitleList"
+        :disabled="subtitleCurrentNode === null"
         @download="downloadSubtitle"
         @upload="uploadSubtitle"
       />
@@ -116,7 +117,6 @@ function downloadSubtitle() {
 async function uploadSubtitle() {
   const srt = await utils.upload();
   subtitleList.value = utils.parseSRT(srt);
-  console.log(subtitleList.value, srt);
   updateTime(video.value.getCurrentTime());
 }
 onMounted(() => {

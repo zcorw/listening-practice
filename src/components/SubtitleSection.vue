@@ -3,8 +3,16 @@
     <div class="subtitle-title">
       字幕
       <div>
-        <a class="download-btn" @click="upload">导入</a>
-        <a class="download-btn" @click="download">下载</a>
+        <a class="download-btn" :class="{ disabled: disabled }" @click="upload">
+          导入
+        </a>
+        <a
+          class="download-btn"
+          :class="{ disabled: disabled }"
+          @click="download"
+        >
+          下载
+        </a>
       </div>
     </div>
     <div class="subtitle-container">
@@ -33,6 +41,10 @@ const props = defineProps({
   subtitles: {
     type: Array as PropType<Subtitle[]>,
     default: () => [],
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
   },
 });
 const emits = defineEmits<{
@@ -84,5 +96,9 @@ function upload() {
   cursor: pointer;
   float: right;
   font-size: 14px;
+  &.disabled {
+    cursor: not-allowed;
+    color: #c0c4cc;
+  }
 }
 </style>
