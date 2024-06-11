@@ -116,8 +116,16 @@ function downloadSubtitle() {
   utils.download(srt);
 }
 async function uploadSubtitle() {
+  const end = subtitleList.value[subtitleList.value.length - 1].endTime;
   const srt = await utils.upload();
   subtitleList.value = utils.parseSRT(srt);
+  if (subtitleList.value[subtitleList.value.length - 1].endTime !== end) {
+    subtitleList.value.push({
+      startTime: subtitleList.value[subtitleList.value.length - 1].endTime,
+      endTime: end,
+      text: "",
+    });
+  }
   updateTime(video.value.getCurrentTime());
 }
 onMounted(() => {

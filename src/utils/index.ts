@@ -30,12 +30,22 @@ const parseSRT = (srt: string): Subtitle[] => {
     const lines = block.split("\n");
     if (lines.length >= 3) {
       const timeMatch = lines[1].match(
-        /(\d{2}:\d{2}:\d{2},\d{3}) --> (\d{2}:\d{2}:\d{2},\d{3})/,
+        /(\d{1,}:\d{2}:\d{2},\d{3}) --> (\d{1,}:\d{2}:\d{2},\d{3})/,
       );
       if (timeMatch) {
         const startTime = parseTime(timeMatch[1]);
         const endTime = parseTime(timeMatch[2]);
         const text = lines.slice(2).join("\n");
+        if (
+          subtitles.length > 0 &&
+          startTime !== subtitles[subtitles.length - 1].endTime
+        ) {
+          subtitles.push({
+            startTime: subtitles[subtitles.length - 1].endTime,
+            endTime: startTime,
+            text: "",
+          });
+        }
         subtitles.push({ startTime, endTime, text });
       }
     }
