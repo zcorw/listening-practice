@@ -1,7 +1,7 @@
 <template>
   <div class="video-player">
     <div class="video-screen">
-      <video ref="videoPlayer" autoplay="false" :style="styles">
+      <video ref="videoPlayer" :autoplay="false" :style="styles">
         Your browser does not support the video tag.
       </video>
       <div v-if="props.subtitleText" class="video-overlay">
