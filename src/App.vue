@@ -112,7 +112,6 @@ function insertTimePoint(time: number) {
   subtitleCurrentNode.value = splitSubtitle(time, subtitleCurrentNode.value);
 }
 function updateTime(time: number) {
-  console.log("🚀 ~ updateTime ~ time:", time);
   subtitleCurrentNode.value = getCurrentSubtitle(time);
 }
 function downloadSubtitle() {

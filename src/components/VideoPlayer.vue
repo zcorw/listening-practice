@@ -23,6 +23,7 @@
         <div class="slider-time">{{ currentTimeDisplay }}</div>
       </div>
       <div class="control-buttons">
+        <a class="control-button fast-back" @click="fastBackTime"></a>
         <a class="control-button prev" @click="prevTime"></a>
         <a
           class="control-button"
@@ -30,6 +31,7 @@
           @click="togglePlay"
         ></a>
         <a class="control-button next" @click="nextTime"></a>
+        <a class="control-button fast-forward" @click="fastForwardTime"></a>
         <a class="control-button mark" @click="insertTimePoint"></a>
       </div>
     </div>
@@ -208,6 +210,16 @@ function nextTime() {
   }
   player.currentTime = duration.value;
 }
+function fastBackTime() {
+  const player = videoPlayer.value;
+  if (!player) return;
+  player.currentTime -= 10;
+}
+function fastForwardTime() {
+  const player = videoPlayer.value;
+  if (!player) return;
+  player.currentTime += 10;
+}
 onMounted(() => {
   const player = videoPlayer.value;
   if (!player) return;
@@ -321,6 +333,12 @@ defineExpose({ loadVideo, getCurrentTime, setPlayTime });
     }
     .mark {
       background-image: url(/images/mark.svg);
+    }
+    .fast-forward {
+      background-image: url(/images/fast-forward.svg);
+    }
+    .fast-back {
+      background-image: url(/images/fast-back.svg);
     }
   }
   .video-overlay {
