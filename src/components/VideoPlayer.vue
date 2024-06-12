@@ -180,12 +180,21 @@ function insertTimePoint() {
   emits("insertTimePoint", currentTime.value);
 }
 function handleKeyDown(event: KeyboardEvent) {
-  if (event.altKey && event.key === "s") {
-    event.preventDefault();
-    togglePlay();
-  } else if (event.altKey && event.key === "i") {
-    event.preventDefault();
-    insertTimePoint();
+  const shortcut = {
+    s: togglePlay,
+    i: insertTimePoint,
+    ArrowLeft: prevTime,
+    ArrowRight: nextTime,
+    p: fastBackTime,
+    n: fastForwardTime,
+  };
+  if (event.altKey) {
+    const key = event.key as keyof typeof shortcut;
+    const keys = Object.keys(shortcut) as Array<keyof typeof shortcut>;
+    if (keys.includes(key)) {
+      event.preventDefault();
+      shortcut[key]();
+    }
   }
 }
 function prevTime() {
@@ -208,17 +217,16 @@ function nextTime() {
       return;
     }
   }
-  player.currentTime = duration.value;
 }
 function fastBackTime() {
   const player = videoPlayer.value;
   if (!player) return;
-  player.currentTime -= 10;
+  player.currentTime -= 5;
 }
 function fastForwardTime() {
   const player = videoPlayer.value;
   if (!player) return;
-  player.currentTime += 10;
+  player.currentTime += 5;
 }
 onMounted(() => {
   const player = videoPlayer.value;
