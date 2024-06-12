@@ -20,11 +20,12 @@
         class="subtitle-item"
         v-for="subtitle in list"
         :key="subtitle.startTime"
+        @click="jump(subtitle)"
       >
         <p>
-          <span>{{ subtitle.startTime }}</span>
+          <span>{{ subtitle.startString }}</span>
           <span>{{ "----->>" }}</span>
-          <span>{{ subtitle.endTime }}</span>
+          <span>{{ subtitle.endString }}</span>
         </p>
         <p>{{ subtitle.text }}</p>
       </div>
@@ -50,13 +51,14 @@ const props = defineProps({
 const emits = defineEmits<{
   (e: "download"): void;
   (e: "upload"): void;
+  (e: "jump", time: number): void;
 }>();
 const list = computed(() => {
   return props.subtitles.map((subtitle) => {
     return {
-      startTime: utils.formatTime(subtitle.startTime),
-      endTime: utils.formatTime(subtitle.endTime),
-      text: subtitle.text,
+      startString: utils.formatTime(subtitle.startTime),
+      endString: utils.formatTime(subtitle.endTime),
+      ...subtitle,
     };
   });
 });
@@ -65,6 +67,9 @@ function download() {
 }
 function upload() {
   emits("upload");
+}
+function jump(subtitle: Subtitle) {
+  emits("jump", subtitle.startTime);
 }
 </script>
 
@@ -80,9 +85,12 @@ function upload() {
   }
   .subtitle-container {
     .subtitle-item {
-      margin-bottom: 10px;
-      padding-bottom: 10px;
+      padding: 10px;
       border-bottom: 1px solid #dcdfe6;
+      cursor: pointer;
+      &:hover {
+        background-color: rgb(217, 236, 255);
+      }
       p {
         line-height: 1.5;
         display: flex;

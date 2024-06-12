@@ -26,6 +26,7 @@
         :disabled="subtitleCurrentNode === null"
         @download="downloadSubtitle"
         @upload="uploadSubtitle"
+        @jump="jump"
       />
     </div>
   </div>
@@ -111,6 +112,7 @@ function insertTimePoint(time: number) {
   subtitleCurrentNode.value = splitSubtitle(time, subtitleCurrentNode.value);
 }
 function updateTime(time: number) {
+  console.log("🚀 ~ updateTime ~ time:", time);
   subtitleCurrentNode.value = getCurrentSubtitle(time);
 }
 function downloadSubtitle() {
@@ -122,6 +124,9 @@ async function uploadSubtitle() {
   const srt = await utils.upload();
   subtitleList.value = utils.parseSRT(srt, end);
   updateTime(video.value.getCurrentTime());
+}
+function jump(time: number) {
+  video.value?.setPlayTime(time);
 }
 onMounted(() => {
   resizeObserver.observe(videoSide.value as HTMLElement);

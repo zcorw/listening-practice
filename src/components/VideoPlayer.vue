@@ -171,6 +171,9 @@ function setCurrentTime() {
 function getCurrentTime() {
   return currentTime.value;
 }
+function setPlayTime(time: number) {
+  videoPlayer.value!.currentTime = time;
+}
 function insertTimePoint() {
   emits("insertTimePoint", currentTime.value);
 }
@@ -223,7 +226,7 @@ onUnmounted(() => {
   player.removeEventListener("timeupdate", setCurrentTime);
   window.removeEventListener("keydown", handleKeyDown);
 });
-defineExpose({ loadVideo, getCurrentTime });
+defineExpose({ loadVideo, getCurrentTime, setPlayTime });
 </script>
 
 <style lang="scss" scoped>
