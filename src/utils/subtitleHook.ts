@@ -41,6 +41,16 @@ export default function subtitleHook() {
     }
     throw new Error("超出时间范围");
   }
+  function removeSubtitle(startTime: number) {
+    for (let i = 0; i < list.value.length; i++) {
+      const current = list.value[i];
+      if (startTime >= current.startTime && startTime < current.endTime) {
+        list.value[i - 1].endTime = list.value[i].endTime;
+        list.value.splice(i, 1);
+        return;
+      }
+    }
+  }
   function clear() {
     list.value = [];
   }
@@ -50,5 +60,6 @@ export default function subtitleHook() {
     splitSubtitle,
     getCurrentSubtitle,
     clear,
+    removeSubtitle,
   };
 }

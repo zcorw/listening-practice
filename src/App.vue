@@ -30,6 +30,7 @@
         @download="downloadSubtitle"
         @upload="uploadSubtitle"
         @jump="jump"
+        @remove="removeSubtitle"
       />
     </div>
   </div>
@@ -63,6 +64,7 @@ const {
   splitSubtitle,
   getCurrentSubtitle,
   clear,
+  removeSubtitle,
 } = subtitleHook();
 const subtitleTimes = computed(() => {
   if (subtitleList.value.length === 0) {

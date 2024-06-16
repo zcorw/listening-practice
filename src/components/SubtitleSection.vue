@@ -18,7 +18,7 @@
     <div class="subtitle-container">
       <div
         class="subtitle-item"
-        v-for="subtitle in list"
+        v-for="(subtitle, i) in list"
         :key="subtitle.startTime"
         @click="jump(subtitle)"
       >
@@ -28,6 +28,11 @@
           <span>{{ subtitle.endString }}</span>
         </p>
         <p>{{ subtitle.text }}</p>
+        <div
+          v-if="i !== 0"
+          class="close"
+          @click.stop="close(subtitle.startTime)"
+        ></div>
       </div>
     </div>
   </div>
@@ -52,6 +57,7 @@ const emits = defineEmits<{
   (e: "download"): void;
   (e: "upload"): void;
   (e: "jump", time: number): void;
+  (e: "remove", time: number): void;
 }>();
 const list = computed(() => {
   return props.subtitles.map((subtitle) => {
@@ -71,6 +77,9 @@ function upload() {
 function jump(subtitle: Subtitle) {
   emits("jump", subtitle.startTime);
 }
+function close(time: number) {
+  emits("remove", time);
+}
 </script>
 
 <style lang="scss" scoped>
@@ -85,6 +94,7 @@ function jump(subtitle: Subtitle) {
   }
   .subtitle-container {
     .subtitle-item {
+      position: relative;
       padding: 10px;
       border-bottom: 1px solid #dcdfe6;
       cursor: pointer;
@@ -95,6 +105,21 @@ function jump(subtitle: Subtitle) {
         line-height: 1.5;
         display: flex;
         justify-content: space-between;
+      }
+      .close {
+        position: absolute;
+        display: none;
+        top: 10px;
+        left: -20px;
+        width: 20px;
+        height: 20px;
+        background-image: url(/images/close.svg);
+        background-size: 100%;
+        background-repeat: no-repeat;
+        cursor: pointer;
+      }
+      &:hover .close {
+        display: block;
       }
     }
   }
