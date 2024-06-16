@@ -41,10 +41,14 @@ export default function subtitleHook() {
     }
     throw new Error("超出时间范围");
   }
+  function clear() {
+    list.value = [];
+  }
   return {
     list,
     init,
     splitSubtitle,
     getCurrentSubtitle,
+    clear,
   };
 }

@@ -221,12 +221,20 @@ function nextTime() {
 function fastBackTime() {
   const player = videoPlayer.value;
   if (!player) return;
-  player.currentTime -= 5;
+  player.currentTime -= 3;
 }
 function fastForwardTime() {
   const player = videoPlayer.value;
   if (!player) return;
-  player.currentTime += 5;
+  player.currentTime += 3;
+}
+function videoStop() {
+  const player = videoPlayer.value;
+  if (!player) return;
+  if (!isPlay.value) {
+    player.pause();
+    isPlay.value = false;
+  }
 }
 onMounted(() => {
   const player = videoPlayer.value;
@@ -246,7 +254,7 @@ onUnmounted(() => {
   player.removeEventListener("timeupdate", setCurrentTime);
   window.removeEventListener("keydown", handleKeyDown);
 });
-defineExpose({ loadVideo, getCurrentTime, setPlayTime });
+defineExpose({ loadVideo, getCurrentTime, setPlayTime, videoStop });
 </script>
 
 <style lang="scss" scoped>

@@ -1,6 +1,9 @@
 <template>
   <div class="container">
     <div ref="videoSide" class="video-side">
+      <div class="header">
+        <div v-if="!!showPlayer" class="back" @click="back"></div>
+      </div>
       <VideoPlayer
         v-if="!!showPlayer"
         ref="video"
@@ -59,6 +62,7 @@ const {
   init,
   splitSubtitle,
   getCurrentSubtitle,
+  clear,
 } = subtitleHook();
 const subtitleTimes = computed(() => {
   if (subtitleList.value.length === 0) {
@@ -127,6 +131,12 @@ async function uploadSubtitle() {
 function jump(time: number) {
   video.value?.setPlayTime(time);
 }
+function back() {
+  video.value?.videoStop();
+  showPlayer.value = false;
+  subtitleCurrentNode.value = null;
+  clear();
+}
 onMounted(() => {
   resizeObserver.observe(videoSide.value as HTMLElement);
 });
@@ -139,6 +149,17 @@ onMounted(() => {
   margin: auto;
   display: flex;
   .video-side {
+    .header {
+      height: 30px;
+      .back {
+        cursor: pointer;
+        height: 30px;
+        width: 30px;
+        background-image: url(/images/back.svg);
+        background-size: 100%;
+        background-repeat: no-repeat;
+      }
+    }
     box-sizing: border-box;
     flex: 1;
     max-width: 1304px;
